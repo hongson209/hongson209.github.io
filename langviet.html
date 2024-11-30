@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Langviet</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #2e3b4e;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-family: 'Lobster', cursive;
+            font-size: 3.5em;
+            font-weight: 400;
+            margin: 0;
+            color: #ffffff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .header .survival {
+            font-size: 4em;
+            font-weight: 300;
+            color: #ffffff;
+            margin: 10px 0;
+        }
+
+        .header p {
+            font-size: 1.5em;
+            color: #8d9096;
+            margin: 10px 0;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            gap: 20px;
+        }
+
+        .countdown div {
+            background: linear-gradient(145deg, #1f2935, #283645);
+            border-radius: 15px;
+            padding: 20px;
+            width: 120px;
+            color: #ffd700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .countdown div span {
+            display: block;
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .countdown div small {
+            font-size: 0.9em;
+            color: #ffffff;
+        }
+
+        .intro {
+            font-size: 1.2em;
+            color: #d3d3d3;
+            margin: 30px auto;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 20px 0;
+            background-color: #2e3b4e;
+            color: #ffffff;
+            font-size: 1em;
+            text-align: center;
+            border-radius: 15px;
+        }
+
+        .top-left-icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .top-left-icon img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .discord-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #7289da;
+            border-radius: 8px;
+            padding: 5px 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .discord-icon i {
+            color: #ffffff;
+            font-size: 1.5em;
+        }
+
+        .discord-icon span {
+            font-size: 1em;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .discord-icon:hover {
+            background-color: #5b6eae;
+            transform: scale(1.1);
+        }
+
+        .developers-section {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .developers-section h2 {
+            font-size: 2em;
+            color: #ffffff;
+            margin-bottom: 30px;
+        }
+
+        .developers {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .developer {
+            padding: 20px;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            transition: box-shadow 0.3s ease;
+            background: linear-gradient(145deg, #1f2935, #283645);
+        }
+
+        .developer img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .developer h3 {
+            margin-top: 10px;
+            color: #ffffff;
+            font-size: 1.2em;
+        }
+
+        .developer p {
+            font-size: 1em;
+            color: #8d9096;
+            margin: 5px 0;
+        }
+
+        .developer .social-icons {
+            margin-top: 10px;
+        }
+
+        .developer .social-icons a {
+            color: #ffffff;
+            font-size: 1.2em;
+            margin: 0 5px;
+            transition: color 0.3s ease;
+        }
+
+        .developer .social-icons a:hover {
+            color: #ffcc00;
+        }
+
+        .developer:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .countdown-finish {
+            display: none;
+            font-size: 3em;
+            color: #00FF00;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-left-icon">
+        <img src="icon.png" alt="Langviet Icon">
+        <span>Langviet</span>
+    </div>
+
+    <a href="https://discord.gg/BrfymsQGBF" class="discord-icon">
+        <i class="fab fa-discord"></i>
+        <span>Discord</span>
+    </a>
+
+    <div class="header">
+        <h1>Langviet</h1>
+        <div class="survival">SURVIVAL</div>
+        <p>Máy chủ sẽ được ra mắt sau:</p>
+    </div>
+
+    <div class="countdown" id="countdown">
+        <div>
+            <span id="days">00</span>
+            <small>Ngày</small>
+        </div>
+        <div>
+            <span id="hours">00</span>
+            <small>Giờ</small>
+        </div>
+        <div>
+            <span id="minutes">00</span>
+            <small>Phút</small>
+        </div>
+        <div>
+            <span id="seconds">00</span>
+            <small>Giây</small>
+        </div>
+    </div>
+
+    <div class="intro">
+        <p>Langviet Survival , đầu tiên xin lỗi về máy chủ trước không được trọn vẹn và có quá nhiều lỗi , và máy chủ dead rất nhanh và bây giờ chúng tôi quyết định sẽ trở lại mong bạn có thể ủng hộ và tin tưởng chúng tôi!.</p>
+    </div>
+
+    <div class="developers-section">
+        <h2>Nhà phát triển của chúng tôi</h2>
+        <div class="developers">
+            <div class="developer">
+                <img src="dev1.png" alt="Hồng Sơn">
+                <h3>Hồng Sơn</h3>
+                <p>Owner</p>
+                <p>Mô tả về Hồng Sơn</p>
+                <div class="social-icons">
+                    <a href="#" class="fab fa-facebook"></a>
+                    <a href="#" class="fab fa-tiktok"></a>
+                    <a href="#" class="fab fa-discord"></a>
+                </div>
+            </div>
+
+            <div class="developer">
+                <img src="dev2.png" alt="HiepMoii">
+                <h3>HiepMoii</h3>
+                <p>Developer</p>
+                <p>Mô tả về HiepMoii</p>
+                <div class="social-icons">
+                    <a href="#" class="fab fa-facebook"></a>
+                    <a href="#" class="fab fa-tiktok"></a>
+                    <a href="#" class="fab fa-discord"></a>
+                </div>
+            </div>
+
+            <div class="developer">
+                <img src="dev3.png" alt="Lua">
+                <h3>Lua</h3>
+                <p>Developer</p>
+                <p>Mô tả về Lua</p>
+                <div class="social-icons">
+                    <a href="#" class="fab fa-facebook"></a>
+                    <a href="#" class="fab fa-tiktok"></a>
+                    <a href="#" class="fab fa-discord"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Langviet Survival © 2024 | Tất cả quyền được bảo lưu</p>
+    </footer>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        const countdownElement = document.getElementById("countdown");
+        const finishElement = document.createElement("div");
+        finishElement.classList.add("countdown-finish");
+        finishElement.innerHTML = 'Ra mắt ngay!';
+        finishElement.addEventListener('click', function() {
+            window.location.href = 'https://discord.gg/BrfymsQGBF';
+        });
+        document.body.appendChild(finishElement);
+
+        const endTime = new Date().getTime() + 3 * 24 * 60 * 60 * 1000;  // 3 days from now
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            if (distance <= 0) {
+                countdownElement.innerHTML = "";
+                finishElement.style.display = 'block';
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerHTML = days;
+            document.getElementById("hours").innerHTML = hours;
+            document.getElementById("minutes").innerHTML = minutes;
+            document.getElementById("seconds").innerHTML = seconds;
+        }
+
+        setInterval(updateCountdown, 1000);
+    </script>
+
+</body>
+</html>

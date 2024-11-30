@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteBase /
+
+# Remove .html extension
+RewriteRule ^(.*)/$ $1.html [L]
+RewriteRule ^(.*)\.html$ $1 [L,R=301]

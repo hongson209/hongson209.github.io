@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className="dark h-screen overflow-hidden">
-      <body className="antialiased selection:bg-indigo-500 selection:text-white h-screen max-h-screen w-full flex items-center justify-center p-1 sm:p-2 overflow-hidden select-none">
+    <html lang="vi" className="dark h-screen overflow-hidden" suppressHydrationWarning={true}>
+      <body className="antialiased selection:bg-indigo-500 selection:text-white h-screen max-h-screen w-full flex items-center justify-center p-1 sm:p-2 overflow-hidden select-none" suppressHydrationWarning={true}>
         {children}
       </body>
     </html>

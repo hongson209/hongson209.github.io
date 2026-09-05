@@ -167,8 +167,8 @@ function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
 
-  // Đường dẫn file nhạc hỗ trợ cả domain gốc và GitHub Pages subpath
-  const trackUrl = './music.mp3';
+  // Local music file added by user
+  const trackUrl = '/music.mp3';
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -176,55 +176,45 @@ function MusicPlayer() {
 
     audio.volume = 0.5;
 
-    // Hàm phát nhạc bắt đầu từ giây thứ 25
-    const attemptPlay = () => {
+    const setSeekAndPlay = () => {
       try {
         if (audio.currentTime < 25) {
           audio.currentTime = 25;
         }
-      } catch {}
+      } catch (e) {}
 
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise
-          .then(() => {
-            setIsPlaying(true);
-            removeInteractionListeners();
-          })
+          .then(() => setIsPlaying(true))
           .catch(() => {
-            // Trình duyệt chặn autoplay khi chưa có tương tác -> giữ nguyên listener chờ click
+            const handleFirstGesture = () => {
+              try {
+                if (audio.currentTime < 25) {
+                  audio.currentTime = 25;
+                }
+              } catch (e) {}
+              audio.play().then(() => setIsPlaying(true)).catch(() => {});
+              window.removeEventListener('pointerdown', handleFirstGesture);
+              window.removeEventListener('keydown', handleFirstGesture);
+              window.removeEventListener('mousemove', handleFirstGesture);
+              window.removeEventListener('scroll', handleFirstGesture);
+            };
+
+            window.addEventListener('pointerdown', handleFirstGesture, { once: true });
+            window.addEventListener('keydown', handleFirstGesture, { once: true });
+            window.addEventListener('mousemove', handleFirstGesture, { once: true });
+            window.addEventListener('scroll', handleFirstGesture, { once: true });
           });
       }
     };
 
-    const handleUserInteraction = () => {
-      attemptPlay();
-    };
-
-    const removeInteractionListeners = () => {
-      window.removeEventListener('click', handleUserInteraction);
-      window.removeEventListener('touchstart', handleUserInteraction);
-      window.removeEventListener('keydown', handleUserInteraction);
-      document.removeEventListener('click', handleUserInteraction);
-    };
-
-    // Đăng ký các sự kiện tương tác thật (click, touch, phím)
-    window.addEventListener('click', handleUserInteraction, { passive: true });
-    window.addEventListener('touchstart', handleUserInteraction, { passive: true });
-    window.addEventListener('keydown', handleUserInteraction, { passive: true });
-    document.addEventListener('click', handleUserInteraction, { passive: true });
-
-    // Thử phát ngay nếu trình duyệt cho phép
     if (audio.readyState >= 1) {
-      attemptPlay();
+      setSeekAndPlay();
     } else {
-      audio.addEventListener('loadedmetadata', attemptPlay, { once: true });
-      audio.addEventListener('canplay', attemptPlay, { once: true });
+      audio.addEventListener('loadedmetadata', setSeekAndPlay, { once: true });
+      audio.addEventListener('canplay', setSeekAndPlay, { once: true });
     }
-
-    return () => {
-      removeInteractionListeners();
-    };
   }, []);
 
   const togglePlay = () => {
@@ -253,7 +243,6 @@ function MusicPlayer() {
         src={trackUrl}
         loop
         preload="auto"
-        playsInline
       />
 
       {/* Spotify Green Icon */}

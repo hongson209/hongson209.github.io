@@ -4,6 +4,15 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/:tab(hongson|friends|font|plugins|contact)',
+        destination: '/',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
+

@@ -162,61 +162,21 @@ function CustomCursor() {
   );
 }
 
-function MusicPlayer() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
+interface MusicPlayerProps {
+  audioRef: React.RefObject<HTMLAudioElement | null>;
+  isPlaying: boolean;
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  isMuted: boolean;
+  setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  // Local music file added by user
-  const trackUrl = '/music.mp3';
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.volume = 0.5;
-
-    const setSeekAndPlay = () => {
-      try {
-        if (audio.currentTime < 25) {
-          audio.currentTime = 25;
-        }
-      } catch (e) {}
-
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => setIsPlaying(true))
-          .catch(() => {
-            const handleFirstGesture = () => {
-              try {
-                if (audio.currentTime < 25) {
-                  audio.currentTime = 25;
-                }
-              } catch (e) {}
-              audio.play().then(() => setIsPlaying(true)).catch(() => {});
-              window.removeEventListener('pointerdown', handleFirstGesture);
-              window.removeEventListener('keydown', handleFirstGesture);
-              window.removeEventListener('mousemove', handleFirstGesture);
-              window.removeEventListener('scroll', handleFirstGesture);
-            };
-
-            window.addEventListener('pointerdown', handleFirstGesture, { once: true });
-            window.addEventListener('keydown', handleFirstGesture, { once: true });
-            window.addEventListener('mousemove', handleFirstGesture, { once: true });
-            window.addEventListener('scroll', handleFirstGesture, { once: true });
-          });
-      }
-    };
-
-    if (audio.readyState >= 1) {
-      setSeekAndPlay();
-    } else {
-      audio.addEventListener('loadedmetadata', setSeekAndPlay, { once: true });
-      audio.addEventListener('canplay', setSeekAndPlay, { once: true });
-    }
-  }, []);
-
+function MusicPlayer({
+  audioRef,
+  isPlaying,
+  setIsPlaying,
+  isMuted,
+  setIsMuted,
+}: MusicPlayerProps) {
   const togglePlay = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -225,6 +185,11 @@ function MusicPlayer() {
       audio.pause();
       setIsPlaying(false);
     } else {
+      try {
+        if (audio.currentTime < 25) {
+          audio.currentTime = 25;
+        }
+      } catch {}
       audio.play().then(() => setIsPlaying(true)).catch(() => {});
     }
   };
@@ -238,13 +203,6 @@ function MusicPlayer() {
 
   return (
     <div className="flex items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-2 rounded-full bg-black/75 border border-white/20 backdrop-blur-xl shadow-2xl">
-      <audio
-        ref={audioRef}
-        src={trackUrl}
-        loop
-        preload="auto"
-      />
-
       {/* Spotify Green Icon */}
       <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#1DB954]/20 border border-[#1DB954]/50 text-[#1DB954] shadow-[0_0_12px_rgba(29,185,84,0.35)]">
         <Music className={'w-4 h-4 ' + (isPlaying ? 'animate-spin-slow' : '')} />
@@ -1220,6 +1178,76 @@ type TabType = 'hongson' | 'friends' | 'font' | 'contact';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('hongson');
+  const [hasEntered, setHasEntered] = useState<boolean>(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+
+  const startMusic = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    try {
+      if (audio.currentTime < 25) {
+        audio.currentTime = 25;
+      }
+    } catch {}
+    audio.play().then(() => {
+      setIsPlaying(true);
+    }).catch(() => {});
+  };
+
+  const handleEnter = () => {
+    if (hasEntered) return;
+    setHasEntered(true);
+    startMusic();
+
+    try {
+      confetti({
+        particleCount: 45,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#6366f1', '#a855f7', '#ec4899', '#06b6d4']
+      });
+    } catch {}
+  };
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = 0.5;
+
+    // Thử autoplay trực tiếp (nếu trình duyệt / MEI cho phép)
+    const tryAutoplay = () => {
+      try {
+        if (audio.currentTime < 25) {
+          audio.currentTime = 25;
+        }
+      } catch {}
+      audio.play().then(() => {
+        setIsPlaying(true);
+        setHasEntered(true); // Tự động mở trang luôn nếu trình duyệt cho phép phát ngay!
+      }).catch(() => {
+        // Trình duyệt chặn -> Màn hình Click To Enter hiển thị chờ người dùng click
+      });
+    };
+
+    if (audio.readyState >= 1) {
+      tryAutoplay();
+    } else {
+      audio.addEventListener('loadedmetadata', tryAutoplay, { once: true });
+      audio.addEventListener('canplay', tryAutoplay, { once: true });
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = () => {
+      if (!hasEntered) {
+        handleEnter();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [hasEntered]);
 
   const tabs: { id: TabType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: 'hongson', label: 'Hongson', icon: User },
@@ -1230,6 +1258,50 @@ export default function Home() {
 
   return (
     <>
+      {/* Background Audio Element */}
+      <audio
+        ref={audioRef}
+        src="./music.mp3"
+        loop
+        preload="auto"
+        playsInline
+      />
+
+      {/* Cyber Entrance Screen (Click to Enter) - Giải quyết 100% Autoplay Policy của mọi trình duyệt */}
+      <div
+        onClick={handleEnter}
+        className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#07090e]/85 backdrop-blur-2xl cursor-pointer select-none transition-all duration-700 ${
+          hasEntered ? 'opacity-0 pointer-events-none scale-105' : 'opacity-100'
+        }`}
+      >
+        <div className="relative p-6 sm:p-8 rounded-3xl bg-white/[0.04] border border-white/15 backdrop-blur-3xl shadow-[0_0_80px_rgba(99,102,241,0.35)] text-center max-w-sm sm:max-w-md mx-4 hover:border-indigo-500/50 hover:scale-[1.02] transition-all group">
+          {/* Animated Avatar with RGB Glow */}
+          <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 rounded-2xl p-1 bg-gradient-to-tr from-[#ff007f] via-[#7928ca] to-[#00dfd8] animate-rgb-glow shadow-xl">
+            <div className="w-full h-full rounded-[14px] overflow-hidden bg-[#0e1017]">
+              <img src="/avatar.gif" alt="Nguyễn Hồng Sơn" className="w-full h-full object-cover" />
+            </div>
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-1">
+            Nguyễn Hồng Sơn
+          </h2>
+          <p className="text-xs text-indigo-300 font-mono mb-4">
+            Full Stack • Vibe Coder 🇻🇳
+          </p>
+
+          {/* Pulsing Enter Button */}
+          <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-mono text-xs sm:text-sm font-bold shadow-lg shadow-indigo-500/30 group-hover:shadow-indigo-500/60 group-hover:scale-105 transition-all">
+            <Sparkles className="w-4 h-4 text-cyan-300 animate-spin-slow" />
+            <span>CLICK TO ENTER</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          </div>
+
+          <p className="text-[11px] text-gray-400 font-mono mt-3.5">
+            🎧 Nhấn bất kỳ đâu để vào Profile & Bật nhạc
+          </p>
+        </div>
+      </div>
+
       {/* Custom Interactive Gaming / Vibe Cursor */}
       <CustomCursor />
 
@@ -1260,7 +1332,13 @@ export default function Home() {
 
             {/* Music Player in Banner */}
             <div className="absolute top-2 sm:top-3 right-2 sm:right-4 z-20">
-              <MusicPlayer />
+              <MusicPlayer
+                audioRef={audioRef}
+                isPlaying={isPlaying}
+                setIsPlaying={setIsPlaying}
+                isMuted={isMuted}
+                setIsMuted={setIsMuted}
+              />
             </div>
           </div>
 

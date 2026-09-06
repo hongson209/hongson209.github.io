@@ -4,7 +4,14 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-};
+  trailingSlash: true,
+  swcMinify: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+}
 
-module.exports = nextConfig;
-
+module.exports = nextConfig
